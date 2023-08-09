@@ -2,6 +2,8 @@
 
 $request = file_get_contents('php://input');
 
+echo mb_strlen($request) . " bytes received\n\n";
+
 if (!empty($request)) {
     echo $request;
 
