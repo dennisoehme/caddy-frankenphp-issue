@@ -1,0 +1,15 @@
+version: "3.8"
+services:
+  php:
+    image: frankenphp-caddy:test
+    build:
+      context: .
+    environment:
+      - CADDY_DEBUG=debug
+      - CADDY_HOSTNAME=localhost
+      - HOME=/tmp
+    volumes:
+      - './Caddyfile:/etc/Caddyfile'
+      - './public:/app/public'
+    ports:
+      - "8000:8000"

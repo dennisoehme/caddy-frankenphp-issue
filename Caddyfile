@@ -1,0 +1,48 @@
+{
+	debug
+	frankenphp {
+		#worker /app/public/index.php
+	}
+
+	# doesn't change anything
+	servers {
+		max_header_size 1MB
+	}
+}
+
+:8000 {
+	log
+
+	tls internal
+
+	route {
+		root * public/
+		# Add trailing slash for directory requests
+		@canonicalPath {
+			file {path}/index.php
+			not path */
+		}
+		redir @canonicalPath {path}/ 308
+
+		# If the requested file does not exist, try index files
+		@indexFiles file {
+			try_files {path} {path}/index.php index.php
+			split_path .php
+		}
+		rewrite @indexFiles {http.matchers.file.relative}
+
+		handle_path /* {
+			request_body {
+				max_size 250MB
+			}
+		}
+
+		# FrankenPHP!
+		@phpFiles path *.php
+		php @phpFiles
+
+		file_server
+
+		respond 404
+	}
+}
